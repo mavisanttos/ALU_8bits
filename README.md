@@ -1,2 +1,23 @@
-# ALU_8bits
-Repositório refrente à construção de uma ALU de 8 bits.
+# ALU 8 bits
+
+## Somador
+
+### Tabela Verdade
+
+### Expressões Booleanas
+
+### Circuito
+
+### Teste
+
+## Subtrator
+
+## Multiplicador
+
+## Divisor
+
+## Shift lógico
+
+## NAND
+
+## XOR
