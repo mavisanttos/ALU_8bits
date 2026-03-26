@@ -12,7 +12,7 @@
 | 0000 1111 | 0F | 15 | Limite do primeiro dígito |
 | 0001 0000 | 10 | 16 | Início do segundo dígito |
 | 0111 1111 | 7F | 127 | Maior número positivo (Caso considere haver números negativos na representação) |
-| 1000 0000 | 80 | 128 | Início dos negativos () |
+| 1000 0000 | 80 | -128 | Início dos negativos |
 | 1111 1111 | FF | 255 | Valor máximo da ALU |
 
 &emsp; Com isso, foram desenvolvidas as operações abaixo utilizando o simulador "Digital":
@@ -87,9 +87,7 @@ $$S = A \oplus B \oplus Cin$$
 <img src="assets\soma_1bit.png" alt="Somador de 1 bit" width="500">
 </div>
 
-&emsp; Para verificação do circuito, podemos testar suas saídas com as combinações listadas na tabela verdade. Como podemos observar no vídeo abaixo, a integração das portas lógicas coincide com nossa tabela referente ao somador de 1 bit:
-
-VIDEO
+&emsp; Para verificação do circuito, podemos testar suas saídas com as combinações listadas na tabela verdade, caso a integração das portas lógicas coincida com nossa tabela referente ao somador de 1 bit, o circuito funciona perfeitamente.
 
 &emsp; Com o funcionamento do somador de 1 bit, podemos usá-lo como "célula base" para expandir a capacidade de processamento do somador para utilizar entradas de 8 bits.
 
@@ -118,8 +116,6 @@ VIDEO
 <img src="assets\soma_8bits.png" alt="Circuito Somador 8 bits" width="500">
 </div>
 
-VIDEO
-
 &emsp; Assim, como utilizamos o somador de 1 bit como célula base para o somador de 8 bits, não se faz necessário repetir os Mapas de Karnaugh, uma vez que a lógica interna de cada bloco permanece a mesma, ela apenas foi escalada.
 
 ### 1.3. Registrador Acumulador (AC)
@@ -145,7 +141,7 @@ VIDEO
 - Saída para a Memória: A soma resultante (S) de cada bit do somador de 8 bits é conectada à entrada D de seu respectivo Flip-Flop.
 - Realimentação: A saída Q de cada Flip-Flop é conectada de volta à entrada A do somador.
 
-&emsp; Dessa forma, o somador está sempre somando o valor atual de 'B' com o valor da memória. O resultado da memória é atualizado sempre que se preciona o botão de Clock, assim, um pulso de subida é enviado e um novo valor é guardado na memória.
+&emsp; Dessa forma, o somador está sempre somando o valor atual de 'B' com o valor da memória. O resultado da memória é atualizado sempre que se pressiona o botão de Clock, assim, um pulso de subida é enviado e um novo valor é guardado na memória.
 
 #### 1.3.3. Simulação
 
@@ -155,11 +151,64 @@ VIDEO
 <img src="assets\soma_AC.png" alt="Circuito Acumulador de 8 bits" width="500">
 </div>
 
-&emsp; Ao clicar no botão de 'Clock', o valor presente nas saídas 'S1' e 'S2' são atualizados e retornam para a entrada do sisitema, permitindo que o circuito incremente valores cumulativamente a cada ciclo, como demonstrado no vídeo abaixo:
+&emsp; Ao clicar no botão de 'Clock', o valor presente nas saídas 'S1' e 'S2' são atualizados e retornam para a entrada do sisitema, permitindo que o circuito incremente valores cumulativamente a cada ciclo.
 
-VIDEO
+## 2. Subtrator
 
-## Subtrator
+&emsp; Para realizar a operação de subtração em um sistema digital, não é necessário construir um circuito totalmente novo e distinto do somador. Assim como na aritmética tradicional, subtrair um valor é o mesmo que somar o seu oposto (por exemplo, $10 - 4$ é o mesmo que $10 + (-4)$), na lógica binária utilizamos o mesmo princípio.
+
+### 2.1. Subtrator de 8 bits
+
+&emsp; Com o objetivo de otimizar o projeto, para o subtrator, utiliza-se a aritmética de Complemento de 2. Essa técnica permite utilizar a mesma estrutura do somador de 8 bits uma vez que uma das entradas seja invertida e somada a 1.
+
+#### 2.1.1 Complemento de 2
+
+&emsp; Em termos matemáticos, subtrair um número de outro é a mesma coisa que somar o oposto de um número com outro (A + B = A + (-B)). No sistema binário, seguimos o seguinte passo para encontrar o negativo de um número:
+1. Inverter todos os bits do número (1 -> 0 e 0 -> 1), isso é conhecido como complemento de 1
+2. Somar 1 ao resultado dessa inversão
+
+&emsp; O circuito projetado realiza esses dois processos usando uma entrada de controle chamada Sel (Seleção).
+
+#### 2.1.2. Portas XOR e 'Sel'
+
+&emsp; Para transformar o somador em subtrator, foram feitas duas modificações principais controladas pelo sinal Sel:
+- Inversão de bit: Cada bit da entrada B passa por uma porta XOR antes de chegar ao somador. A outra entrada da porta XOR está ligada ao sinal Sel.
+    - Se Sel = 0: A porta XOR mantém o valor original de B (Modo Soma).
+    - Se Sel = 1: A porta XOR inverte todos os bits de B (Modo Subtração).
+- Soma do bit 1: O sinal 'Sel' também está conectado ao 'Ci' do primeiro bloco somador, assim, quando Sel = 1, ele soma 1 no cálculo, assim, é realizado o complemento de 2.
+
+&emsp; Assim, em termos binários, temos a seguinte lógica, para subtrair 5-3 em 4 bits (para exemplificação):
+- A = 0101 (5)
+- B = 0011 (3)
+&emsp; Ao ativar Sel = 1:
+- B é invertido pelas portas XORs: 0011 -> 1100
+- O 'Ci' do primeiro bloco recebe 1
+- A conta final fica: 0101 + 1100 + 1 = 10010
+&emsp; Assim, o resultado, desprezando o 'Co' (1), é 0010, que é 2 em decimal, sendo coerente com a operação 5 - 3 = 2.
+
+OBS.: Se o resultado é positivo, ou igual a zero, o 'Co' sempre será 1, caso contrário, ele será 0.
+
+#### 2.1.3. Simulação
+
+&emsp; Assim, o circuito final possui dupla função. Com a entrada Sel=0, o circuito opera como somador visto anteriormente. Já com Sel=1, ele transforma a entrada 'B' em negativa e realiza uma operação de subtração.
+
+<div align="center">
+<img src="assets\subtracao_8bits.png" alt="Circuito Somador/Subtrator de 8 bits" width="600">
+</div>
+
+&emsp; Essa implemnetação otimiza ter duas operações matemáticas em um mesmo sistema.
+
+### 2.2. Registrador Acumulador (AC)
+
+&emsp; A integração do registrador acumulador do somador com a lógica do subtrator transforma o circuito em uma unidade capaz de realizar operações sucessivas de adição e subtração sobre um valor armazenado.
+- Sinal 'Sel': Ele atua como o seletor de instrução.
+    - Quando queremos acumular um valor (AC = AC + B), mantemos Sel = 0.
+    - Quando queremos descontar um valor (AC = AC - B), ativamos Sel = 1.
+- Clock: Independentemente da operação escolhida (soma ou subtração), o resultado só é efetivado no acumulador após o pulso de Clock, garantindo um controle de quando a operação deve ser salva na memória.
+
+<div align="center">
+<img src="assets\subtracao_AC.png" alt="Circuito Somador/Subtrator Acumulador de 8 bits" width="600">
+</div>
 
 ## Multiplicador
 
