@@ -210,14 +210,45 @@ OBS.: Se o resultado é positivo, ou igual a zero, o 'Co' sempre será 1, caso c
 <img src="assets\subtracao_AC.png" alt="Circuito Somador/Subtrator Acumulador de 8 bits" width="600">
 </div>
 
-## Multiplicador
+## 3. Multiplicador
 
-## Divisor
+## 4. Divisor
 
-## Shift lógico
+## 5. Shift lógico
 
-## NAND
+&emsp; O deslocamento lógico é uma operação utilizada para manipulação de bits e para realizar multiplicações ou divisões rápidas por potências de 2. Nesta unidade, o circuito recebe um dado de 8 bits e o desloca para a esquerda ou para a direita conforme comando.
 
-## XOR
+&emsp; Diferente das operações aritméticas, o shift lógico não utiliza portas lógicas, ele é implementado através do reordenamento das conexões de barramento:
+- Shift Left (SHL): Para deslocar à esquerda, cada bit An é conectado à saída {n+1}. O bit A7 é descartado e a posição 0 da saída é conectada ao GND (Terra).
 
-## ALU
+<div align="center">
+<img src="assets\shift_left.png" alt="Shift Left" width="600">
+</div>
+
+- Shift Right (SHR): Para deslocar à direita, cada bit An é conectado à saída {n-1}. O bit A0 é descartado e a posição 7 da saída é conectada ao GND (Terra).
+
+<div align="center">
+<img src="assets\shift_right.png" alt="Shift Right" width="600">
+</div>
+
+### 5.1. Multiplexador
+
+&emsp; Para permitir a escolha do deslocamento em um único circuto, utiliza-se um Multiplexador (MUX) de 8 bits. Ele funciona recebento a saída do barramento do SHL e do SHR. Um sinal de controle 'Dir' seleciona qual dos dois barramentos será direcionado para a saída final do circuito:
+- Dir = 0: A saída exibe o número original deslocado para a esquerda (Shift Left).
+- Dir = 1: A saída exibe o número original deslocado para a direita (Shift Right).
+
+#### 5.1.1. Simulação
+
+&emsp; Assim, o circuito final possui dupla função. Com a entrada Dir=0, o circuito opera como Shift Left e o valor é dobrado. Já com Dir=1, ele opera como Shft Right e o valor é reduzido à metade. O uso do multiplexador permite essa alternância de forma imediata.
+
+<div align="center">
+<img src="assets\shift.png" alt="Shift" width="600">
+</div>
+
+&emsp; Esta implementação otimiza o funcionamento do Shift em apenas um circuito, sem consumo extra de processamento lógico.
+
+## 6. NAND
+
+## 7. XOR
+
+## 8. ALU
