@@ -249,6 +249,62 @@ OBS.: Se o resultado é positivo, ou igual a zero, o 'Co' sempre será 1, caso c
 
 ## 6. NAND
 
+&emsp; A porta NAND (Not-AND) é capaz de reproduzir qualquer outra função lógica. Nesta unidade, a operação é realizada bit a bit, comparando cada bit da entrada A com o bit correspondente da entrada B.
+
+### 6.1. Tabela Verdade da Porta NAND de 1 bit
+
+&emsp; A lógica NAND resulta 0 apenas quando ambas as entradas são 1. Caso contrário, a saída será sempre 1. Ela pode ser associada como o contrário da porta AND.
+
+| A | B | Saída (NAND) |
+| :---: | :---: | :---: |
+| 0 | 0 | 1 |
+| 0 | 1 | 1 |
+| 1 | 0 | 1 |
+| 1 | 1 | 0 |
+
+### 6.2. Simulação
+
+&emsp; Para processar 8 bits simultaneamente, o circuito utiliza entradas de 8 bits do simulador que são conectadas diretamente a uma única porta NAND configurada para a mesma largura de bits.
+- Lógica da Saída: Se inserirmos, por exemplo, o valor hexadecimal 01 em ambas as entradas (A e B):
+    - Os bits de 7 a 1 serão 0 NAND 0, resultando em 1.
+    - O bit 0 será 1 NAND 1, resultando em 0.
+        - Ao aplicar o valor hexadecimal 01 em ambas as entradas, a porta NAND realiza a lógica 1 NAND 1 no bit 0 (resultando em 0) e 0 NAND 0 nos bits de 1 a 7 (resultando em 1).
+    - O resultado final em binário será 1111 1110, que corresponde ao valor FE em hexadecimal.
+
+<div align="center">
+<img src="assets\nand.png" alt="Circuito Porta NAND com 8 bits" width="600">
+</div>
+
+&emsp; Essa unidade serve como base para a construção de funções lógicas mais complexas e para a manipulação seletiva de bits em dados de 8 bits.
+
 ## 7. XOR
+
+&emsp; A operação XOR (Exclusive OR) é utilizada para identificar diferenças entre dois sinais. Diferente da porta OR, ela resulta 1 apenas quando as entradas possuem valores distintos entre si.
+
+### 7.1. Tabela Verdade da Porta XOR de 1 bit
+
+&emsp; A lógica XOR resulta em 1 sempre que os bits de entrada forem diferentes. Se os bits forem iguais (ambos 0 ou ambos 1), a saída será 0.
+
+| A | B | Saída (NAND) |
+| :---: | :---: | :---: |
+| 0 | 0 | 0 |
+| 0 | 1 | 1 |
+| 1 | 0 | 1 |
+| 1 | 1 | 0 |
+
+### 7.2. Simulação
+
+&emsp; A entrada de 8 bits é conectada diretamente a uma porta XOR de largura correspondente, processando a comparação de todos os bits de forma simultânea.
+- Lógica da Saída: Se inserirmos, por exemplo, os valores hexadecimais E e A nas entradas:
+    - 0E em binário é 0000 1110
+    - 0A em binário é 0000 1010
+        - Comparando bit a bit: os bits iguais resultam em 0 e apenas o bit 2 (que é diferente: 1 XOR 0) resulta em 1.
+        - O resultado final em binário será 0000 0100, que corresponde ao valor 04 em hexadecimal.
+
+<div align="center">
+<img src="assets\xor.png" alt="Circuito Porta XOR com 8 bits" width="600">
+</div>
+
+&emsp; Esta operação é utilizada para verificar a igualdade entre dois números ou para realizar a inversão seletiva de bits.
 
 ## 8. ALU
