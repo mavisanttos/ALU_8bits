@@ -212,7 +212,118 @@ OBS.: Se o resultado é positivo, ou igual a zero, o 'Co' sempre será 1, caso c
 
 ## 3. Multiplicador
 
+&emsp; O circuito de multiplicação de 8 bits realiza o produto de dois números binários através do método de Array Multiplier. Este circuito simula o processo de multiplicação manual, onde cada bit do multiplicador (B) gera uma linha de produtos parciais que são somados e deslocados para compor o resultado final.
+
+### 3.1. Multiplicador de 1 bit
+
+&emsp; A unidade básica do sistema consiste em um multiplicador de 1 bit composto por uma porta AND e um Somador de 1 bit (Full Adder).
+- Lógica AND: Na aritmética binária, a multiplicação de dois bits resulta em 1 apenas quando ambos são 1 ($1 \times 1 = 1$). Para qualquer outra combinação, o resultado é 0. Essa característica é identica ao comportamento de uma porta lógica AND.
+
+    Na multiplicação binária de 1 bit, a regra é:
+    - $0 \times 0 = 0$
+    - $0 \times 1 = 0$
+    - $1 \times 0 = 0$
+    - $1 \times 1 = 1$
+
+    Essa é exatamente a tabela verdade de uma porta AND. Portanto, para multiplicar dois bits, usamos uma porta AND.
+
+- Somador: Para construir um multiplicador de vários bits, o resultado de uma multiplicação ($A \times B$) precisa ser somado aos resultados parciais vindos das colunas superiores e ao "vai-um" (Carry) das colunas à esquerda. O somador de 1 bit recebe o produto da porta AND e realiza essa integração.
+
+| A (S) | B (AXB) | Cin | S | Cout | 
+| :---: | :---: | :---: | :---: | :---: |
+| 0 | 0 | 0 | 0 | 0 |
+| 0 | 0 | 1 | 1 | 0 |
+| 0 | 1 | 0 | 1 | 0 |
+| 0 | 1 | 1 | 0 | 1 |
+| 1 | 0 | 0 | 1 | 0 |
+| 1 | 0 | 1 | 0 | 1 |
+| 1 | 1 | 0 | 0 | 1 |
+| 1 | 1 | 1 | 1 | 1 |
+
+<div align="center">
+<img src="assets\multiplicacao_1bit.png" alt="Circuito Multiplicador de 1 bits" width="800">
+</div>
+
+&emsp; A integração ocorre da seguinte forma: a porta AND atua como um 'filtro' que decide se o valor de $A$ deve ser somado naquela posição da grade. Se $B$ for 0, a AND anula o valor de $A$, e o somador apenas repassa adiante a soma que veio das linhas superiores. Se $B$ for 1, a AND 'deixa passar' o valor de $A$, que é então somado ao acumulado parcial, gerando um novo resultado e, possivelmente, um bit de transporte (Co) para a próxima célula.
+
+### 3.2. Multiplicador de 8 bits
+
+&emsp; A partir do multiplicador de 1 bit, linhas de multiplicação são formadas, cada uma contendo 8 células do multiplicador de 1 bit. Cada linha é responsável por multiplicar o barramento A completo por um único bit do barramento B.
+- Linha 0 (Base): Multiplica A0-A7 por B0. Como não há linha superior, a entrada de soma (S) de todos os somadores é conectada ao Ground (0).
+- Passagem de Carry: Dentro de cada linha, o Co (Carry Out) de uma célula é conectado ao Ci (Carry In) da célula imediatamente à direita. O Ci da primeira célula de cada linha (à esquerda) é sempre 0.
+- Interconexão de Linhas: A partir da Linha 1, a entrada de soma de cada célula recebe o bit de resultado da linha anterior, porém com um deslocamento à esquerda.
+    - Exemplo: O $S0\_1$ da Linha 0 entra como soma na primeira célula da Linha 1.
+
+#### 3.2.1. Saídas: AC e MQ (16 bits)
+
+&emsp; Como o produto de dois números de 8 bits resulta em 16 bits, o resultado é dividido em dois barramentos de 8 bits
+- AC (Accumulator - LSB): Coleta os bits menos significativos. Eles são formados pela primeira saída de cada linha:
+    - $AC = \{S7\_0, S6\_0, S5\_0, S4\_0, S3\_0, S2\_0, S1\_0, S0\_0\}$
+- MQ (Multiplier Quotient - MSB): Coleta os bits mais significativos que sobram da última linha de processamento:
+    - $MQ = \{Co\_7, S7\_7, S7\_6, S7\_5, S7\_4, S7\_3, S7\_2, S7\_1\}$
+
+#### 3.2.2. Simulação
+
+&emsp; Na simulação abaixo, ao inserirmos os valores nos barramentos A e B, o sinal percorre a malha de somadores.
+
+<div align="center">
+<img src="assets\multiplicacao_8bit.png" alt="Circuito Multiplicador de 8 bits" width="800">
+</div>
+
+&emsp; Esse circuito não possui uma lógica de acumulador pois, com o objetivo de otimização de recursos, um conjunto de registradores acumuladores será inserido na ALU completa.
+
 ## 4. Divisor
+
+&emsp; Para a divisão de 8 bits implementa-se um Divisor de Matriz por Restauração. O circuito funciona como uma "máquina de estados combinacional" de 8 níveis, onde cada linha tenta subtrair o divisor e, caso o resultado seja negativo, o valor original é restaurado antes de passar para a próxima linha.
+
+### 4.1. Subtrator com Restauração
+
+&emsp; A unidade básica para realizar a divisão é um subtrator com restauração de 1 bit, ele funciona como um subtrator e com tomador de decisões acerca do resultado (se a subtração ocorre ou se o valor original é restaurado)
+
+#### 4.1.1. Lógica de Subtração
+
+&emsp; Utiliza-se um somador de 1 bit adaptado para realizar operações de subtração, uma vez que uma subtração nada mais é que uma adição com múmeros negativos. Para realizar essa operação foram utilizadas três entradas:
+- Entrada A: O bit do dividendo parcial.
+- Entrada Não B ($\bar{B}$): O bit do divisor invertido.
+- Entrada Ci (Carry In): Responsável por somar o "1" necessário para completar a lógica de complemento de 2 ou receber o transporte da célula anterior.
+
+&emsp; A saída Co (Carry Out) deste somador indica o transporte para a próxima célula à esquerda.
+
+#### 4.1.2. Multiplexador
+
+&emsp; O componente central para a funcionalidade de "restauração" é o multiplexador que recebe duas opções de dados:
+- Entrada 0: Conectada diretamente à entrada A (valor original).
+- Entrada 1: Conectada à saída S (Soma) do somador (resultado da subtração).
+
+#### 4.1.3. Seleção e Resultado
+
+&emsp; O funcionamento do bloco é definido pela entrada de seleção (SEL):
+- Se SEL = 1: O MUX valida a subtração e a saída R (Resto) assume o valor calculado pelo somador ($A - B$).
+- Se SEL = 0: O MUX ignora o resultado do somador e a saída R restaura o valor original de A.
+
+&emsp; Esta configuração garante que o dividendo parcial nunca se torne um número "inválido" ou negativo durante as sucessivas tentativas de divisão.
+
+<div align="center">
+<img src="assets\subtracao_restauracao.png" alt="Célula de Subtração com Restauração" width="600">
+</div>
+
+### 4.2. Subtrator de 8 bits
+
+&emsp; Para fazermos uma divisão com 8 bits, construimos uma matriz composta por 64 células organizadas em 8 linhas e 8 colunas. A conexão segue três padrões:
+- Cout (Horizontal): Em cada linha, o sinal de 'Co' viaja da direita para a esquerda. O último Cout da célula mais à esquerda define o bit do quociente daquela linha. Se $Cout = 1$, a subtração foi bem-sucedida.
+- Shift Left: Para simular o processo de baixar o próximo dígito da divisão manual, o resultado (R) de cada célula (saída do MUX) é passado para a célula à sua esquerda na linha de baixo na entrada 'A'.
+- Controle: O bit do quociente gerado no final de uma linha é enviado de volta para todas as 8 células da mesma linha. Isso garante que todas as células decidam se devem manter a subtração ou restaurar o valor.
+
+#### 4.2.1. Entradas e Saídas
+
+- Dividendo (A): Posicionado bit a bit ($A_7$ a $A_0$) na coluna da extrema direita de cada linha, começando da Linha 0.
+- Divisor (B): Entra de forma constante em todas as colunas da matriz.
+- Quociente (MQ - Multiplier Quotient): Formado pelos 8 bits de controle coletados da ponta esquerda de cada linha. O topo da matriz gera o bit mais significativo ($MQ_7$).
+- Resto (AC - Accumulator): Formado pelas 8 saídas dos MUXs da última linha (Linha 7).
+
+<div align="center">
+<img src="assets\divisor_8bit.png" alt="Divisor de 8 bits" width="600">
+</div>
 
 ## 5. Shift lógico
 
@@ -285,7 +396,7 @@ OBS.: Se o resultado é positivo, ou igual a zero, o 'Co' sempre será 1, caso c
 
 &emsp; A lógica XOR resulta em 1 sempre que os bits de entrada forem diferentes. Se os bits forem iguais (ambos 0 ou ambos 1), a saída será 0.
 
-| A | B | Saída (NAND) |
+| A | B | Saída (XOR) |
 | :---: | :---: | :---: |
 | 0 | 0 | 0 |
 | 0 | 1 | 1 |
@@ -308,3 +419,42 @@ OBS.: Se o resultado é positivo, ou igual a zero, o 'Co' sempre será 1, caso c
 &emsp; Esta operação é utilizada para verificar a igualdade entre dois números ou para realizar a inversão seletiva de bits.
 
 ## 8. ALU
+
+&emsp; A etapa final do projeto consiste em integrar todos os módulos descritos acima em uma única unidade funcional (ALU). Essa unidade final utiliza um Registrador Acumulador para armazenar resultados e permitir operações sucessivas.
+
+### 8.1. Registrador
+
+&emsp; Nesse circuito, a entrada manual "A" dos operadores com duas entradas foi substituída pelo valor Q, proveniente da saída do registrador:
+- Entrada B: Permanece como uma entrada manual para o usuário inserir o novo dado.
+- Entrada Q (Acumulador): Alimenta automaticamente a segunda entrada de todos os blocos operacionais.
+- Funcionamento: O resultado de uma operação (ex: Soma) é calculado instantaneamente, mas só é "salvo" e enviado de volta para a entrada dos blocos quando o usuário pressiona o botão =.
+    - Ao pressionar "=", ocorre uma borda de subida que captura o valor na saída do multiplexador
+
+### 8.2. Multiplexador
+
+&emsp; Para gerenciar as diversas saídas dos blocos, foi utilizado um Multiplexador de 8 bits. A seleção da operação é feita através do botão OP (Operação), que define qual resultado será direcionado para a entrada do registrador.
+
+| Operação (Binário) | Operação | Fonte do Dado | Função |
+| :---: | :---: | :---: | :---: |
+| 0000 | Soma | Somador (S1 e S2) | Q+B→Q |
+| 0001 | Subtração | Subtrator (Compl. 2) | Q−B→Q |
+| 0010 | Mult. LSB | Multiplicador (AC) | Parte baixa do produto |
+| 0011 | Mult. MSB | Multiplicador (MQ) | Parte alta do produto |
+| 0100 | Div. Quociente | Divisor (MQ) | Resultado da divisão |
+| 0101 | Div. Resto | Divisor (AC) | Resto da divisão |
+| 0110 | Shift Left | Deslocamento Esq. | Dobra o valor de Q |
+| 0111 | Shift Right | Deslocamento Dir. | Divide Q por 2 |
+| 1000 | NAND | Porta NAND 8 bits | Lógica Universal |
+| 1001 | XOR | Porta XOR 8 bits | Comparação de bits |
+
+### 8.3. Saída de dados
+
+&emsp; Para a leitura do acumulador, a saída Q de 8 bits é enviada para um distribuidor que separa o barramento em dois grupos de 4 bits: o grupo S2 (bits 0-3) representa o dígito menos significativo e o grupo S1 (bits 4-7) o mais significativo.
+
+<div align="center">
+<img src="assets\alu_8bit.png" alt="ALU de 8 bits" width="600">
+</div>
+
+[Video para demonstração do funcionamento]()
+
+A implementação desta ALU de 8 bits demonstrou como portas lógicas simples podem ser escalonadas para realizar operações matemáticas. Desde a construção da célula básica do somador até a matriz de divisão com restauração e o laço de realimentação do acumulador, o projeto reflete a arquitetura fundamental de um processador real, capaz de processar, armazenar e manipular dados de forma eficiente.
