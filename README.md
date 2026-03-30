@@ -184,6 +184,7 @@ $$S = A \oplus B \oplus Cin$$
 - B é invertido pelas portas XORs: 0011 -> 1100
 - O 'Ci' do primeiro bloco recebe 1
 - A conta final fica: 0101 + 1100 + 1 = 10010
+
 &emsp; Assim, o resultado, desprezando o 'Co' (1), é 0010, que é 2 em decimal, sendo coerente com a operação 5 - 3 = 2.
 
 OBS.: Se o resultado é positivo, ou igual a zero, o 'Co' sempre será 1, caso contrário, ele será 0.
@@ -298,8 +299,8 @@ OBS.: Se o resultado é positivo, ou igual a zero, o 'Co' sempre será 1, caso c
 #### 4.1.3. Seleção e Resultado
 
 &emsp; O funcionamento do bloco é definido pela entrada de seleção (SEL):
-- Se SEL = 1: O MUX valida a subtração e a saída R (Resto) assume o valor calculado pelo somador ($A - B$).
-- Se SEL = 0: O MUX ignora o resultado do somador e a saída R restaura o valor original de A.
+- Se SEL = 1: O multiplexador valida a subtração e a saída R assume o valor calculado pelo somador ($A - B$).
+- Se SEL = 0: O multiplexador ignora o resultado do somador e a saída R restaura o valor original de A.
 
 &emsp; Esta configuração garante que o dividendo parcial nunca se torne um número "inválido" ou negativo durante as sucessivas tentativas de divisão.
 
@@ -455,6 +456,6 @@ OBS.: Se o resultado é positivo, ou igual a zero, o 'Co' sempre será 1, caso c
 <img src="assets\alu_8bit.png" alt="ALU de 8 bits" width="600">
 </div>
 
-[Video para demonstração do funcionamento]()
+[Video para demonstração do funcionamento](https://youtu.be/OaFYrV307hE)
 
 A implementação desta ALU de 8 bits demonstrou como portas lógicas simples podem ser escalonadas para realizar operações matemáticas. Desde a construção da célula básica do somador até a matriz de divisão com restauração e o laço de realimentação do acumulador, o projeto reflete a arquitetura fundamental de um processador real, capaz de processar, armazenar e manipular dados de forma eficiente.
