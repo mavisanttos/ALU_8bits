@@ -458,4 +458,4 @@ OBS.: Se o resultado é positivo, ou igual a zero, o 'Co' sempre será 1, caso c
 
 [Video para demonstração do funcionamento](https://youtu.be/OaFYrV307hE)
 
-A implementação desta ALU de 8 bits demonstrou como portas lógicas simples podem ser escalonadas para realizar operações matemáticas. Desde a construção da célula básica do somador até a matriz de divisão com restauração e o laço de realimentação do acumulador, o projeto reflete a arquitetura fundamental de um processador real, capaz de processar, armazenar e manipular dados de forma eficiente.
+&emsp; A implementação desta ALU de 8 bits demonstrou como portas lógicas simples podem ser escalonadas para realizar operações matemáticas. Desde a construção da célula básica do somador até a matriz de divisão com restauração e o laço de realimentação do acumulador, o projeto reflete a arquitetura fundamental de um processador real, capaz de processar, armazenar e manipular dados de forma eficiente.
